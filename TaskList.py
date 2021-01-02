@@ -7,6 +7,7 @@ from kivy.clock import Clock
 from kivy.uix.label import Label
 from kivy.uix.popup import Popup
 from kivy.uix.button import Button
+from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
 from datepicker import DatePicker
@@ -17,11 +18,13 @@ from datepicker import DatePicker
 # (Stupid Kivy doesn't allow me to easily set length limits on TextInputs so that the default list name
 #  could simply be something longer and achieve a 100% chance of not getting found out)
 default_list = "485A39CA22060964FE81DE1A570636C167A2560E5EB6786E9B3CCE2004E49CCA485A39CA22060964FE81DE1A570636C167A2560E5EB6786E9B3CCE2004E49CCA"
-# Data format: dict with tasklist names as keys and dicts,
-# consisting of a task list and a "complete" boolean, as corresponding values
+# Data format: dict with values of the last open list and a dict containing all tasklists with tasklist names as keys
+# and dicts, consisting of a task list and a "complete" boolean, as corresponding values
 # Comes with a default list that contains all tasks that are not part of any lists.
 # Save file example can be found as "TasksData_example.json"
-data = {default_list: {"tasks": [], "completed": True}}
+data = {"last_opened": default_list,
+        "tasklists": {default_list: {"tasks": [],
+                                     "completed": True}}}
 
 
 # Load data from save file
@@ -65,8 +68,8 @@ class TaskList:
 # Store task in the data variable and call save()
 def save_task(name, deadline, desc, parent_list, popup_instance):
     new_task = Task(name, deadline, desc, None)
-    data[parent_list]["tasks"].append(new_task.get_data())
-    data[parent_list]["completed"] = data[parent_list]["completed"] & True
+    data["tasklists"][parent_list]["tasks"].append(new_task.get_data())
+    data["tasklists"][parent_list]["completed"] = data["tasklists"][parent_list]["completed"] & True
     save()
     popup_instance.dismiss()
     success_msg = SuccessPopup("Task created")
@@ -89,7 +92,7 @@ class SuccessPopup(Popup):
 # Popup to input new task parameters
 def create_task_popup():
     popup = Popup(title="Create new task",
-                  size_hint=(0.5, 0.5))
+                  size_hint=(0.5, 0.8))
     popup.add_widget(NewTaskPopupContent(popup))
     popup.open()
 
@@ -103,13 +106,25 @@ class NewTaskPopupContent(BoxLayout):
         self.add_widget(Label(text='Deadline'))
         deadline_input = DatePicker()
         self.add_widget(deadline_input)
+        taskset = set(data["tasklists"].keys()) - {default_list, }
+        print(taskset)
+        if len(taskset) > 0:
+            self.add_widget(Label(text="Task list"))
+            tasklist_dropdown = DropDown()
+            for key in list(taskset):
+                btn = Button(text=key, size_hint_y=None, height=44, on_release=lambda x: tasklist_dropdown.select(btn.text))
+                tasklist_dropdown.add_widget(btn)
+            tasklist_dropdown_btn = Button(text="Choose a task list",
+                                           on_release=tasklist_dropdown.open)
+            self.add_widget(tasklist_dropdown_btn)
+            tasklist_dropdown.bind(on_select=lambda instance, x: setattr(tasklist_dropdown_btn, 'text', x))
         self.add_widget(Label(text="Description"))
         desc_input = TextInput(hint_text="Short description of the task.")
         self.add_widget(desc_input)
         self.add_widget(Button(text="Save", on_press=lambda *args: save_task(name_input.text,
                                                                              deadline_input.text,
                                                                              desc_input.text,
-                                                                             # CHANGE ME once task lists are implemented
+                                                                             # TODO: CHANGE THIS once task lists are implemented
                                                                              default_list,
                                                                              popup_instance)))
         self.add_widget(Button(text="Cancel", on_press=lambda *args: popup_instance.dismiss()))
@@ -135,8 +150,7 @@ class New(BoxLayout):
     def __init__(self, **kwargs):
         super(New, self).__init__(**kwargs)
         self.add_widget(Button(text='New task', on_press=lambda x: create_task_popup()))
-        btn1 = Button(text='New task list', on_press=lambda x: create_tasklist_popup())
-        self.add_widget(btn1)
+        self.add_widget(Button(text='New task list', on_press=lambda x: create_tasklist_popup()))
 
 
 # Main layout
