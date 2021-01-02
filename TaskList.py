@@ -107,7 +107,6 @@ class NewTaskPopupContent(BoxLayout):
         deadline_input = DatePicker()
         self.add_widget(deadline_input)
         taskset = set(data["tasklists"].keys()) - {default_list, }
-        print(taskset)
         if len(taskset) > 0:
             self.add_widget(Label(text="Task list"))
             tasklist_dropdown = DropDown()
