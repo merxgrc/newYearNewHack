@@ -151,7 +151,7 @@ class New(BoxLayout):
     def __init__(self, **kwargs):
         super(New, self).__init__(size_hint_y=0.1, **kwargs)
         self.add_widget(Button(text='New task', size_hint_x=0.15, on_press=lambda x: create_task_popup()))
-        self.add_widget(Label(text=""))
+        self.add_widget(DarkerLabel(text=""))
         self.add_widget(Button(text='New task list', size_hint_x=0.2, on_press=lambda x: create_tasklist_popup()))
 
 
@@ -163,8 +163,8 @@ class Old(GridLayout):
             self.add_widget(Button(text="check", size_hint=(0.1, 0.1)))
             print(task["name"])
             self.add_widget(Label(text=task["name"], size_hint_y=0.1))
-        self.add_widget(Label(size_hint_x=0.1))
-        self.add_widget(Label())
+        self.add_widget(DarkerLabel(size_hint_x=0.1))
+        self.add_widget(DarkerLabel())
 
 
 # Main layout
@@ -174,9 +174,9 @@ class MainLayout(BoxLayout):
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(orientation='vertical', **kwargs)
         if data["last_opened"] != default_list:
-            self.add_widget(Label(text=data["last_opened"], size_hint_y=0.05))
+            self.add_widget(DarkerLabel(text=data["last_opened"], size_hint_y=0.05))
         else:
-            self.add_widget(Label(text="All", size_hint_y=0.05))
+            self.add_widget(DarkerLabel(text="All", size_hint_y=0.05))
         self.add_widget(DarkLabel(size_hint_y=None, size=(-1, 2)))
         self.add_widget(Old())
         self.add_widget(New())
@@ -186,6 +186,11 @@ class MainLayout(BoxLayout):
 class DarkLabel(Label):
     def __init__(self, **kwargs):
         super(DarkLabel, self).__init__(**kwargs)
+
+
+class DarkerLabel(Label):
+    def __init__(self, **kwargs):
+        super(DarkerLabel, self).__init__(**kwargs)
 
 
 class TaskellApp(App):
