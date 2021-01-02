@@ -1,6 +1,7 @@
 Task list application made using Kivy https://kivy.org/#home
 
 Installation instructions:
+* STRONGLY RECOMMENDED: create and activate a virtual environment
 * Run "pip install -r requirements.txt" to install required modules
 * Run TaskList.Py
 

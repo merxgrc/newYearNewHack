@@ -26,13 +26,13 @@ data = {default_list: {"tasks": [], "completed": True}}
 
 # Load data from save file
 def load():
-    with open('TasksData_example.json') as f:
+    with open('TasksData.json') as f:
         return json.load(f)
 
 
 # Save data to file to recover it on next launch
 def save():
-    with open('TasksData_example.json', 'wb') as f:
+    with open('TasksData.json', 'wb') as f:
         json.dump(data, codecs.getwriter('utf-8')(f), ensure_ascii=False, indent=4)
 
 
@@ -157,6 +157,6 @@ class TaskellApp(App):
 
 
 if __name__ == '__main__':
-    if os.path.isfile("TasksData_example.json"):
+    if os.path.isfile("TasksData.json"):
         data = load()
     TaskellApp().run()
