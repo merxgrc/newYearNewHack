@@ -10,6 +10,8 @@ from kivy.uix.button import Button
 from kivy.uix.dropdown import DropDown
 from kivy.uix.textinput import TextInput
 from kivy.uix.boxlayout import BoxLayout
+from kivy.uix.gridlayout import GridLayout
+from kivy.properties import ListProperty
 from datepicker import DatePicker
 
 # SHA-256 hash of "newYearNewHack" - json only allows dict keys to be strings,
@@ -92,7 +94,7 @@ class SuccessPopup(Popup):
 # Popup to input new task parameters
 def create_task_popup():
     popup = Popup(title="Create new task",
-                  size_hint=(0.5, 0.8))
+                  size_hint=(0.5, 0.9))
     popup.add_widget(NewTaskPopupContent(popup))
     popup.open()
 
@@ -111,7 +113,7 @@ class NewTaskPopupContent(BoxLayout):
             self.add_widget(Label(text="Task list"))
             tasklist_dropdown = DropDown()
             for key in list(taskset):
-                btn = Button(text=key, size_hint_y=None, height=44, on_release=lambda x: tasklist_dropdown.select(btn.text))
+                btn = Button(text=key, size_hint_y=None, height=20, on_release=lambda x: tasklist_dropdown.select(btn.text))
                 tasklist_dropdown.add_widget(btn)
             tasklist_dropdown_btn = Button(text="Choose a task list",
                                            on_release=tasklist_dropdown.open)
@@ -147,9 +149,22 @@ class NewTaskListPopupContent(BoxLayout):
 # Sublayout for "Add-new-X" buttons
 class New(BoxLayout):
     def __init__(self, **kwargs):
-        super(New, self).__init__(**kwargs)
-        self.add_widget(Button(text='New task', on_press=lambda x: create_task_popup()))
-        self.add_widget(Button(text='New task list', on_press=lambda x: create_tasklist_popup()))
+        super(New, self).__init__(size_hint_y=0.1, **kwargs)
+        self.add_widget(Button(text='New task', size_hint_x=0.15, on_press=lambda x: create_task_popup()))
+        self.add_widget(Label(text=""))
+        self.add_widget(Button(text='New task list', size_hint_x=0.2, on_press=lambda x: create_tasklist_popup()))
+
+
+class Old(GridLayout):
+    def __init__(self, **kwargs):
+        super(Old, self).__init__(**kwargs)
+        self.cols = 2
+        for task in data["tasklists"][data["last_opened"]]["tasks"]:
+            self.add_widget(Button(text="check", size_hint=(0.1, 0.1)))
+            print(task["name"])
+            self.add_widget(Label(text=task["name"], size_hint_y=0.1))
+        self.add_widget(Label(size_hint_x=0.1))
+        self.add_widget(Label())
 
 
 # Main layout
@@ -158,12 +173,21 @@ class New(BoxLayout):
 class MainLayout(BoxLayout):
     def __init__(self, **kwargs):
         super(MainLayout, self).__init__(orientation='vertical', **kwargs)
-        self.add_widget(Label(text="Hello world!"))
-        new = New()
-        self.add_widget(new)
+        if data["last_opened"] != default_list:
+            self.add_widget(Label(text=data["last_opened"], size_hint_y=0.05))
+        else:
+            self.add_widget(Label(text="All", size_hint_y=0.05))
+        self.add_widget(DarkLabel(size_hint_y=None, size=(-1, 2)))
+        self.add_widget(Old())
+        self.add_widget(New())
 
 
 # Kivy initiation
+class DarkLabel(Label):
+    def __init__(self, **kwargs):
+        super(DarkLabel, self).__init__(**kwargs)
+
+
 class TaskellApp(App):
     def build(self):
         return MainLayout()
