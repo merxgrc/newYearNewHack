@@ -160,7 +160,6 @@ class NewTaskPopupContent(BoxLayout):
         self.add_widget(Button(text="Cancel", on_press=lambda *args: popup_instance.dismiss()))
 
 
-# TODO: Popup to input new tasklist parameters
 def create_tasklist_popup():
     popup = Popup(title="Create new List",
                   size_hint=(0.5, 0.9))
