@@ -133,16 +133,26 @@ class NewTaskPopupContent(BoxLayout):
 
 # TODO: Popup to input new tasklist parameters
 def create_tasklist_popup():
-    popup = Popup(title="Create new tasklist",
-                  size_hint=(0.5, 0.5))
+    popup = Popup(title="Create new List",
+                  size_hint=(0.5, 0.9))
     popup.add_widget(NewTaskListPopupContent(popup))
     popup.open()
+
 
 
 class NewTaskListPopupContent(BoxLayout):
     def __init__(self, popup_instance, **kwargs):
         super(NewTaskListPopupContent, self).__init__(orientation='vertical', **kwargs)
-        self.add_widget(Label(text='Ooh, you found me!'))
+        self.add_widget(Label(text='List name'))
+        name_input = TextInput(hint_text ='List name', multiline = False)
+        self.add_widget(name_input)
+        self.add_widget(Label(text='Task name'))
+        name_input = TextInput(hint_text="Task name", multiline=False)
+        self.add_widget(name_input)
+        self.add_widget(Label(text='Deadline'))
+        deadline_input = DatePicker()
+        self.add_widget(deadline_input)
+        self.add_widget(Button(text='Save', on_press=lambda *args: save_tasklist(name_input.text)))
         self.add_widget(Button(text="Cancel", on_press=lambda *args: popup_instance.dismiss()))
 
 
